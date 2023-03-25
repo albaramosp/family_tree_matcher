@@ -1,14 +1,44 @@
 {
     "1": {
         "name": "alba",
-        "surnames": "ramos pedroviejo"
+        "surname": "ramos pedroviejo",
+        "first_child": null,
+        "right_sibling": null,
+        "partner": null
     },
     "2": {
         "name": "juan",
-        "surnames": "ramos sanchez"
+        "surname": "ramos sanchez",
+        "first_child": "1",
+        "right_sibling": "4",
+        "partner": "3"
     },
     "3": {
         "name": "maria jose",
-        "surnames": "pedroviejo gutierrez"
+        "surname": "pedroviejo gutierrez",
+        "first_child": "1",
+        "right_sibling": null,
+        "partner": "2"
+    },
+    "4": {
+        "name": "lucas",
+        "surname": "jimenez sanchez",
+        "first_child": null,
+        "right_sibling": null,
+        "partner": null
+    },
+    "5": {
+        "name": "antonia",
+        "surname": "sanchez johnson",
+        "first_child": null,
+        "right_sibling": null,
+        "partner": "6"
+    },
+    "6": {
+        "name": "francisco antonio",
+        "surname": "ramos guerrero",
+        "first_child": null,
+        "right_sibling": null,
+        "partner": "5"
     }
 }
