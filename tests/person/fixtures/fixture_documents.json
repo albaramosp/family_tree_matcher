@@ -31,5 +31,14 @@
         "surname": "ramos guerrero",
         "first_child": "2",
         "partner": "5"
+    },
+    "7": {
+        "name": "david",
+        "surname": "demarco",
+        "right_sibling": "8"
+    },
+    "8": {
+        "name": "laura",
+        "surname": "romero rodriguez"
     }
 }
