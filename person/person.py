@@ -14,7 +14,7 @@ class Person:
     id: Optional[str] = None
 
 
-class AbstractPersonManager(ABC):
+class PersonRepository(ABC):
     def serialize(self, person: Person):
         ...
 
@@ -30,7 +30,7 @@ class IncorrectPerson(Exception):
     ...
 
 
-class MongoPersonManager(AbstractPersonManager):
+class MongoPersonRepository(PersonRepository):
     def __init__(self, client):
         self.client = client
         self.database = self.client['family_tree_matcher']
@@ -62,7 +62,7 @@ class MongoPersonManager(AbstractPersonManager):
 
         return result
 
-    def save(self, person: Person):
+    def save(self, person: Person) -> str:
         """
         Save a person and its relatives into the database,
         returning the id of the inserted person. If the person
@@ -80,7 +80,7 @@ class MongoPersonManager(AbstractPersonManager):
 
         return self._get_or_create(person)
 
-    def _get_or_create(self, person: Person):
+    def _get_or_create(self, person: Person) -> str:
         """
         Retrieve a person if it's already registered in the database
         by checking if any other person with the same name and
@@ -160,30 +160,3 @@ class MongoPersonManager(AbstractPersonManager):
                 "_id": person.partner.id
             }, {"$set": {
                 "_id": person.partner.id}})
-
-    # TODO en matcher?
-    def _recursive_sibling_search(self, person_id: str):
-        if person_id is None:
-            return []
-        else:
-            result = self._recursive_sibling_search(self.collection.find_one({
-                '_id': person_id
-            },
-                {'right_sibling': 1})[0]['right_sibling'])
-            result.append(person_id)
-            return result
-
-    def _get_person_siblings(self, person: Person) -> list:
-        # Get & store right sibling until no more siblings are found
-        instance = self.collection.find_one({
-            'name': person.name,
-            'surname': person.surname,
-            'partner': person.partner,
-            'first_child': person.first_child,
-            'right_sibling': person.right_sibling
-        }, {'_id': 1})
-        if instance:
-            person_id = instance[0]['_id']
-            res = self._recursive_sibling_search(person_id)
-            print(res)
-        return []

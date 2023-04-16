@@ -1,10 +1,10 @@
 import unittest
 from unittest.mock import patch
 
+import mongomock
 import pymongo
 
-from person.person_manager import MongoPersonManager, IncorrectPerson, PersonAlreadyExists
-from person.person_manager import Person
+from person.person import MongoPersonRepository, IncorrectPerson, Person
 from settings import test
 import json
 import os
@@ -15,7 +15,7 @@ class TestMongoPersonManager(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.sut = MongoPersonManager(cls.fixture_db)
+        cls.sut = MongoPersonRepository(cls.fixture_db)
 
         with open(os.path.join(os.getcwd(), 'fixtures/fixture_documents.json'), 'r') as f:
             fixture_docs = json.loads(f.read())
@@ -68,12 +68,34 @@ class TestMongoPersonManager(unittest.TestCase):
         obtained = self.sut.save(fixture)
         self.assertEqual(obtained, '7')
 
+        # A person with the same name but different family, existing relative
+        fixture_person = Person('alba',
+                                'jimenez sanchez',
+                                right_sibling=Person('lucas', 'jimenez sanchez'))
+
+        self.sut.save(fixture_person)
+        mocked_insert_one.assert_called_with({
+            "name": 'alba',
+            "surname": 'jimenez sanchez',
+            "first_child": None,
+            "right_sibling": '4',
+            "partner": None
+        })
+
         # A person with the same name but different family
+        # Fake the sibling's inserted id
         mocked_insert_one.return_value = pymongo.results.InsertOneResult('mocked_id', 'mocked_id')
         fixture_person = Person('alba',
                                 'ramos pedroviejo',
                                 right_sibling=Person('sonia', 'ramos pedroviejo'))
 
-        obtained = self.sut.save(fixture_person)
-        self.assertEqual(obtained, "mocked_id")
+        self.sut.save(fixture_person)
+        mocked_insert_one.assert_called_with({
+            "name": 'alba',
+            "surname": 'ramos pedroviejo',
+            "first_child": None,
+            "right_sibling": 'mocked_id',
+            "partner": None
+        })
 
+        # TODO insert a couple, how to handle the loop?
