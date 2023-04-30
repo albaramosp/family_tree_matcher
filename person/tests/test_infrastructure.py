@@ -1,61 +1,32 @@
 import unittest
 from unittest.mock import patch
-
-import mongomock
 import pymongo
-
-from person.person import MongoPersonRepository, IncorrectPerson, Person
+from person.domain.model import Person
+from person.infrastructure.mongo_repository import MongoPersonRepository
 from settings import test
 import json
 import os
 
 
-class TestMongoPersonManager(unittest.TestCase):
-    fixture_db = test.CLOUD_MONGO_CLIENT
+class TestMongoPersonRepository(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.sut = MongoPersonRepository(cls.fixture_db)
+        fixture_db = test.CLOUD_MONGO_CLIENT
+        cls.sut = MongoPersonRepository(fixture_db)  # We can use the factory here
 
-        with open(os.path.join(os.getcwd(), 'fixtures/fixture_documents.json'), 'r') as f:
+        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                               'fixtures/fixture_documents.json'), 'r') as f:
             fixture_docs = json.loads(f.read())
 
         for pk in fixture_docs.keys():
             doc = fixture_docs[pk]
             doc['_id'] = pk
-            cls.fixture_db[
+            fixture_db[
                 test.FAMILY_TREE_DATABASE][
                 test.PEOPLE_COLLECTION].insert_one(doc)
 
-    def test_serialize(self):
-        # Serialize incorrect person
-        self.assertRaises(IncorrectPerson, self.sut.serialize, Person(None, None))
-        self.assertRaises(IncorrectPerson, self.sut.serialize, Person('Alba', None))
-
-        # Serialize simple person
-        fixture = Person('Alba', 'Ramos Pedroviejo')
-        obtained = self.sut.serialize(fixture)
-        self.assertEqual({
-            'name': 'Alba',
-            'surname': 'Ramos Pedroviejo'
-        }, obtained)
-
-        # Serialize person with relatives
-        fixture = Person('Alba',
-                         'Ramos Pedroviejo',
-                         partner=Person(
-                             'Test',
-                             'Test',
-                             id='XXX'))
-        obtained = self.sut.serialize(fixture)
-        self.assertEqual({
-            'name': 'Alba',
-            'surname': 'Ramos Pedroviejo',
-            'partner': 'XXX'
-        }, obtained)
-
-    @patch('mongomock.collection.Collection.insert_one')
-    def test_save(self, mocked_insert_one):
+    def test_save_existing(self):
         # A person who is already registered
         fixture = Person('alba',
                          'ramos pedroviejo')
@@ -68,6 +39,8 @@ class TestMongoPersonManager(unittest.TestCase):
         obtained = self.sut.save(fixture)
         self.assertEqual(obtained, '7')
 
+    @patch('mongomock.collection.Collection.insert_one')
+    def test_save_with_existing_relative(self, mocked_insert_one):
         # A person with the same name but different family, existing relative
         fixture_person = Person('alba',
                                 'jimenez sanchez',
@@ -82,6 +55,8 @@ class TestMongoPersonManager(unittest.TestCase):
             "partner": None
         })
 
+    @patch('mongomock.collection.Collection.insert_one')
+    def test_save_with_new_relative(self, mocked_insert_one):
         # A person with the same name but different family
         # Fake the sibling's inserted id
         mocked_insert_one.return_value = pymongo.results.InsertOneResult('mocked_id', 'mocked_id')

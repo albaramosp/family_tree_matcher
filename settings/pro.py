@@ -11,5 +11,6 @@ MONGO_DB_PASSWORD = environ.get("MONGO_DB_PASSWORD")
 CLOUD_MONGO_CLIENT = MongoClient(MONGO_DB_HOST,
                                  username=MONGO_DB_USER,
                                  password=MONGO_DB_PASSWORD)
+print(CLOUD_MONGO_CLIENT)
 FAMILY_TREE_DATABASE = 'family_tree_matcher'
 PEOPLE_COLLECTION = 'people'

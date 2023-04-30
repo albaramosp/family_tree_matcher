@@ -1,5 +1,5 @@
-from interfaces.public import AbstractMatcher
-from person.person import Person
+from person.domain.model import Person
+from matcher.matcher_interfaces import AbstractMatcher
 
 
 class MongoMatcher(AbstractMatcher):
@@ -47,4 +47,3 @@ class MongoMatcher(AbstractMatcher):
             res = self._recursive_sibling_search(person_id)
             print(res)
         return []
-

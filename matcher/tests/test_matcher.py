@@ -2,7 +2,7 @@ import unittest
 import json
 import os
 
-from matcher.matcher import MongoMatcher
+from matcher.infrastructure.mongo_matcher import MongoMatcher
 from settings import test
 from mongomock import MongoClient
 
@@ -14,7 +14,8 @@ class TestMatcher(unittest.TestCase):
     def setUpClass(cls):
         cls.sut = MongoMatcher(cls.fixture_db)
 
-        with open(os.path.join(os.getcwd(), 'fixtures/fixture_documents.json'), 'r') as f:
+        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                               'fixtures/fixture_documents.json'), 'r') as f:
             fixture_docs = json.loads(f.read())
 
         for pk in fixture_docs.keys():
