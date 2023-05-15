@@ -1,66 +1,16 @@
-from __future__ import annotations
-from abc import ABC
-from dataclasses import dataclass
 from typing import Optional
-
-
-@dataclass
-class Person:
-    name: str
-    surname: str
-    first_child: Optional[Person] = None
-    right_sibling: Optional[Person] = None
-    partner: Optional[Person] = None
-    id: Optional[str] = None
-
-
-class PersonRepository(ABC):
-    def serialize(self, person: Person):
-        ...
-
-    def save(self, person: Person):
-        ...
-
-
-class PersonAlreadyExists(Exception):
-    ...
-
-
-class IncorrectPerson(Exception):
-    ...
+from person.domain.model import Person
+from person.domain.driven.ports import PersonRepository
 
 
 class MongoPersonRepository(PersonRepository):
+    def get(self, person_id: str) -> Person:
+        pass
+
     def __init__(self, client):
         self.client = client
         self.database = self.client['family_tree_matcher']
         self.collection = self.database['people']
-
-    # TODO I may not need this
-    def serialize(self, person: Person) -> dict:
-        """
-        Transform a person object into a dictionary. The
-        relatives of the person are stored as references.
-        :param person: Person object
-        :return: dictionary with person's properties
-        """
-        if not person.name or not person.surname:
-            raise IncorrectPerson("Person must have name and surname")
-
-        result = {
-            "name": person.name,
-            "surname": person.surname,
-        }
-
-        # Relatives are stored as references
-        if person.first_child:
-            result["first_child"] = person.first_child.id
-        if person.right_sibling:
-            result["right_sibling"] = person.right_sibling.id
-        if person.partner:
-            result["partner"] = person.partner.id
-
-        return result
 
     def save(self, person: Person) -> str:
         """
