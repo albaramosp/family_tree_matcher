@@ -9,9 +9,4 @@ class PersonUseCase:
 
 class SavePersonUseCase(PersonUseCase):
     def execute(self, person: Person):
-        self.repository.save(person)
-
-
-class GetPersonUseCase(PersonUseCase):
-    def execute(self, person_id: str) -> Person:
-        return self.repository.get(person_id)
+        self.repository.save_person(person)

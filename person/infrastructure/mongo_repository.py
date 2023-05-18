@@ -4,15 +4,77 @@ from person.domain.driven.ports import PersonRepository
 
 
 class MongoPersonRepository(PersonRepository):
-    def get(self, person_id: str) -> Person:
-        pass
-
     def __init__(self, client):
         self.client = client
         self.database = self.client['family_tree_matcher']
         self.collection = self.database['people']
 
-    def save(self, person: Person) -> str:
+    def person_from_mongo_instance(self, instance: dict) -> Person:
+        first_child = right_sibling = partner = None
+        if instance.get('first_child'):
+            person = self.collection.find_one({
+                '_id': instance['first_child']
+            })
+            if person:
+                first_child = self.person_from_mongo_instance(person)
+        if instance.get('right_sibling'):
+            person = self.collection.find_one({
+                '_id': instance['right_sibling']
+            })
+            if person:
+                right_sibling = self.person_from_mongo_instance(person)
+        if instance.get('partner'):
+            person = self.collection.find_one({
+                '_id': instance['partner']
+            })
+            if person:
+                partner = self.person_from_mongo_instance(person)
+
+        return Person(name=instance['name'],
+                      surname=instance['surname'],
+                      first_child=first_child,
+                      partner=partner,
+                      right_sibling=right_sibling)
+
+    def get_person_id(self, person: Person) -> Optional[str]:
+        first_child_id, right_sibling_id, partner_id = self._get_relatives_ids(person)
+
+        query = {
+            "name": person.name,
+            "surname": person.surname,
+            "first_child": None,
+            "right_sibling": None,
+            "partner": None
+        }
+
+        if person.first_child:
+            query["first_child"] = first_child_id
+        if person.right_sibling:
+            query["right_sibling"] = right_sibling_id
+        if person.partner:
+            query["partner"] = partner_id
+
+        existing_person = self.collection.find_one(query)
+        person_id = None
+        if existing_person:
+            person_id = existing_person['_id']
+
+        return person_id
+
+    def _get_relatives_ids(self, person: Person) -> (Optional[str],
+                                                     Optional[str],
+                                                     Optional[str]):
+        first_child_id = right_sibling_id = partner_id = None
+        if person.first_child:
+            first_child_id = self.get_person_id(person.first_child)
+        if person.right_sibling:
+            right_sibling_id = self.get_person_id(person.right_sibling)
+        if person.partner:
+            partner_id = self.get_person_id(person.partner)
+
+        return first_child_id, right_sibling_id, partner_id
+
+    def save_person(self, person: Person) -> str:
         """
         Save a person and its relatives into the database,
         returning the id of the inserted person. If the person
@@ -69,11 +131,11 @@ class MongoPersonRepository(PersonRepository):
         """
         first_child_id = right_sibling_id = partner_id = None
         if person.first_child:
-            first_child_id = self.save(person.first_child)
+            first_child_id = self.save_person(person.first_child)
         if person.right_sibling:
-            right_sibling_id = self.save(person.right_sibling)
+            right_sibling_id = self.save_person(person.right_sibling)
         if person.partner:
-            partner_id = self.save(person.partner)
+            partner_id = self.save_person(person.partner)
 
         return first_child_id, right_sibling_id, partner_id
 
