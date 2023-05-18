@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
+from typing import List
 
-from matcher.domain.model import MatcherOperationResponseDto
-from person.domain.model import PersonOperationRequestDto
+from person.domain.model import PersonDto
 
 
 class MatcherManager(ABC):
     @abstractmethod
-    def handle_match_siblings(self, rq: PersonOperationRequestDto) -> MatcherOperationResponseDto:
+    def handle_match_siblings(self, rq: PersonDto) -> List[PersonDto]:
         ...

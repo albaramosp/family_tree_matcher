@@ -1,5 +1,5 @@
 from person.domain.driver.ports import PersonManager
-from person.domain.model import PersonOperationRequestDto, PersonOperationResponseDto, person_from_dto
+from person.domain.model import PersonDto, PersonOperationResponseDto, person_from_dto
 from person.application.use_cases import SavePersonUseCase
 from person.infrastructure.factory import create_mongo_person_repository
 
@@ -15,15 +15,15 @@ class DefaultManager(PersonManager):
     method with another storage implementation could be used as long as it
     respects the abstraction agreement.
     """
-    def handle_save(self, rq: PersonOperationRequestDto) -> PersonOperationResponseDto:
+    def handle_save(self, rq: PersonDto) -> PersonOperationResponseDto:
         person = person_from_dto(rq)
         res = PersonOperationResponseDto()
         try:
-            SavePersonUseCase(repository=create_mongo_person_repository()).execute(person=person)
+            SavePersonUseCase(repository=create_mongo_person_repository()).save_person(person=person)
             res.person = rq
         except Exception as e:
             print("Exception: ", e)
-            res.error = e
+            res.error = repr(e)
             res.error_code = 500
 
         return res

@@ -1,7 +1,5 @@
 from typing import List, Optional
 from person.infrastructure.mongo_repository import MongoPersonRepository
-from person.domain.model import Person
-from person.domain.driven.ports import NonExistingPerson
 from matcher.domain.driven.ports import MatcherManager
 
 
@@ -12,30 +10,18 @@ class MongoMatcher(MatcherManager):
         self.collection = self.database['people']
         self.person_repository = MongoPersonRepository(client)
 
-    def match_half_siblings(self, person: Person) -> List[Person]:
-        #  x -- y       a -- y    y was married twice, secretly
-        #   /            /        y had b with a and t&z with x
-        #  /            /         y confesses b he has a lost brother, t
-        # z-----t      b-----t    t doesn't know about b's existence
-        #                         TODO half_sibling search should handle this case
-        pass
-
-    def match_siblings(self, person: Person) -> List[dict]:
-        person_id = self.person_repository.get_person_id(person)
-
-        if person_id:
-            instance = self.collection.find_one({
-                '_id': person_id
-            })
-            result = []
-            self._sibling_search(person_id=instance.get('right_sibling'),
-                                 result=result,
-                                 search_type='right')
-            self._sibling_search(person_id=instance.get('_id'),
-                                 result=result,
-                                 search_type='left')
-            return result
-        raise NonExistingPerson("Person not found in the database")
+    def match_siblings(self, person_id: str) -> List[dict]:
+        instance = self.collection.find_one({
+            '_id': person_id
+        })
+        result = []
+        self._sibling_search(person_id=instance.get('right_sibling'),
+                             result=result,
+                             search_type='right')
+        self._sibling_search(person_id=instance.get('_id'),
+                             result=result,
+                             search_type='left')
+        return result
 
     def _sibling_search(self,
                         person_id: dict,
@@ -64,15 +50,17 @@ class MongoMatcher(MatcherManager):
             return
         else:
             key = '_id' if search_type == 'right' else 'right_sibling'
-            person = self.collection.find_one({
+            people = self.collection.find({
                 key: person_id
             })
 
-            if person:
-                parsed_person = self.person_repository.person_from_mongo_instance(person)
-                result.append(parsed_person)
-                self._sibling_search(person_id=person.get('right_sibling') if search_type == 'right' else person.get('_id'),
-                                     result=result,
-                                     search_type=search_type)
+            if people:
+                for person in people:
+                    parsed_person = self.person_repository.person_from_mongo_instance(person)
+                    result.append(parsed_person)
+                    self._sibling_search(
+                        person_id=person.get('right_sibling') if search_type == 'right' else person.get('_id'),
+                        result=result,
+                        search_type=search_type)
 
     # TODO an observer pattern to update people when a family member is created

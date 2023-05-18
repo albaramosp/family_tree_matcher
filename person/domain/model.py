@@ -14,20 +14,34 @@ class Person:
     id: Optional[str] = None
 
 
-class PersonOperationRequestDto(BaseModel):
-    name: str = None
-    surname: str = None
-    first_child: Optional[PersonOperationRequestDto] = None
-    partner: Optional[PersonOperationRequestDto] = None
-    right_sibling: Optional[PersonOperationRequestDto] = None
+class PersonDto(BaseModel):
+    name: str
+    surname: str
+    first_child: Optional[PersonDto] = None
+    partner: Optional[PersonDto] = None
+    right_sibling: Optional[PersonDto] = None
 
 
 class PersonOperationResponseDto(BaseModel):
     error_code: int = None
     error: str = None
-    person: Optional[PersonOperationRequestDto] = None
+    person: Optional[PersonDto] = None
 
 
+def person_to_dto(person: Person) -> PersonDto:
+    dto = PersonDto(name=person.name,
+                    surname=person.surname)
+    if person.first_child:
+        dto.first_child = person_to_dto(person.first_child)
+    if person.right_sibling:
+        dto.right_sibling = person_to_dto(person.right_sibling)
+    if person.partner:
+        dto.partner = person_to_dto(person.partner)
+
+    return dto
+
+
+def person_from_dto(dto: PersonDto) -> Person:
 def person_to_dto(person: Person) -> PersonOperationRequestDto:
     first_child = right_sibling = partner = None
     if person.first_child:

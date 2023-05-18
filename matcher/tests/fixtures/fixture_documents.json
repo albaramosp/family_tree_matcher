@@ -16,5 +16,10 @@
     "4": {
         "name": "y",
         "surname": "y"
+    },
+    "5": {
+        "name": "c",
+        "surname": "c",
+        "right_sibling": "4"
     }
 }

@@ -1,8 +1,10 @@
+from typing import List
+
 from matcher.application.use_cases import MatchSiblingsUseCase
 from matcher.domain.driver.ports import MatcherManager
-from matcher.domain.model import MatcherOperationResponseDto
 from matcher.infrastructure.factory import create_mongo_matcher_manager
-from person.domain.model import PersonOperationRequestDto, person_from_dto, person_to_dto
+from person.domain.model import PersonDto, person_from_dto, person_to_dto
+from person.infrastructure.factory import create_mongo_person_repository
 
 
 def get_manager() -> MatcherManager:
@@ -10,20 +12,11 @@ def get_manager() -> MatcherManager:
 
 
 class DefaultManager(MatcherManager):
-    def handle_match_siblings(self, rq: PersonOperationRequestDto) -> MatcherOperationResponseDto:
+    def handle_match_siblings(self, rq: PersonDto) -> List[PersonDto]:
         person = person_from_dto(rq)
-        res = MatcherOperationResponseDto()
+        matches = MatchSiblingsUseCase(
+            manager=create_mongo_matcher_manager(),
+            repository=create_mongo_person_repository()).execute(person=person)
 
-        try:
-            matches = MatchSiblingsUseCase(manager=create_mongo_matcher_manager()).execute(person=person)
-            parsed_matches = []
-            if matches:
-                for person in matches:
-                    parsed_matches.append(person_to_dto(person))
-            res.matches = parsed_matches
-        except Exception as e:
-            print("Exception: ", e)
-            res.error = e
-            res.error_code = 500
-
-        return res
+        return [person_to_dto(person) for person in matches] \
+            if matches else []
