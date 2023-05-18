@@ -1,49 +1,78 @@
+from typing import List, Optional
+from person.infrastructure.mongo_repository import MongoPersonRepository
 from person.domain.model import Person
-from matcher.matcher_interfaces import AbstractMatcher
+from person.domain.driven.ports import NonExistingPerson
+from matcher.domain.driven.ports import MatcherManager
 
 
-class MongoMatcher(AbstractMatcher):
+class MongoMatcher(MatcherManager):
     def __init__(self, client):
         self.client = client
         self.database = self.client['family_tree_matcher']
         self.collection = self.database['people']
+        self.person_repository = MongoPersonRepository(client)
 
-    def match(self, person: Person) -> list:
-        match = []
+    def match_half_siblings(self, person: Person) -> List[Person]:
+        #  x -- y       a -- y    y was married twice, secretly
+        #   /            /        y had b with a and t&z with x
+        #  /            /         y confesses b he has a lost brother, t
+        # z-----t      b-----t    t doesn't know about b's existence
+        #                         TODO half_sibling search should handle this case
+        pass
 
-        brothers = self._get_person_siblings(person)
+    def match_siblings(self, person: Person) -> List[dict]:
+        person_id = self.person_repository.get_person_id(person)
 
-        # TODO match other type of relationships
+        if person_id:
+            instance = self.collection.find_one({
+                '_id': person_id
+            })
+            result = []
+            self._sibling_search(person_id=instance.get('right_sibling'),
+                                 result=result,
+                                 search_type='right')
+            self._sibling_search(person_id=instance.get('_id'),
+                                 result=result,
+                                 search_type='left')
+            return result
+        raise NonExistingPerson("Person not found in the database")
 
-        if len(brothers) > 0:
-            match = brothers
+    def _sibling_search(self,
+                        person_id: dict,
+                        result: list,
+                        search_type: str = "right") -> Optional[List[dict]]:
+        """
+        Search for siblings. For right search type, search for
+        every right sibling link until end of chain given the
+        initial person to search from. For example, given y as t's
+        right sibling, if z states t as its right sibling, y is its
+        sibling too.
+        For left search type, search for person pointing whose
+        right sibling link points to the given person and get
+        back on the chain. For example, given y, search for t
+        as it's pointing to y as right sibling, then search
+        for z as it's pointing to t as right sibling.
+           x
+          /
+         z---->t----y----...
 
-        return match
+        :param person_id: person to search for siblings
+        :param search_type: right or left search types
+        :return list of right siblings
+        """
+        if person_id is None:
+            return
+        else:
+            key = '_id' if search_type == 'right' else 'right_sibling'
+            person = self.collection.find_one({
+                key: person_id
+            })
+
+            if person:
+                parsed_person = self.person_repository.person_from_mongo_instance(person)
+                result.append(parsed_person)
+                self._sibling_search(person_id=person.get('right_sibling') if search_type == 'right' else person.get('_id'),
+                                     result=result,
+                                     search_type=search_type)
 
     # TODO an observer pattern to update people when a family member is created
-    # TODO en matcher?
-    def _recursive_sibling_search(self, person_id: str):
-        if person_id is None:
-            return []
-        else:
-            result = self._recursive_sibling_search(self.collection.find_one({
-                '_id': person_id
-            },
-                {'right_sibling': 1})[0]['right_sibling'])
-            result.append(person_id)
-            return result
-
-    def _get_person_siblings(self, person: Person) -> list:
-        # Get & store right sibling until no more siblings are found
-        instance = self.collection.find_one({
-            'name': person.name,
-            'surname': person.surname,
-            'partner': person.partner,
-            'first_child': person.first_child,
-            'right_sibling': person.right_sibling
-        }, {'_id': 1})
-        if instance:
-            person_id = instance[0]['_id']
-            res = self._recursive_sibling_search(person_id)
-            print(res)
-        return []

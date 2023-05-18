@@ -5,11 +5,7 @@ from person.domain.model import Person
 
 class PersonRepository(ABC):
     @abstractmethod
-    def save(self, person: Person):
-        ...
-
-    @abstractmethod
-    def get(self, person_id: str) -> Person:
+    def save_person(self, person: Person):
         ...
 
 
@@ -18,4 +14,8 @@ class PersonAlreadyExistsException(Exception):
 
 
 class IncorrectPersonException(Exception):
+    ...
+
+
+class NonExistingPerson(Exception):
     ...

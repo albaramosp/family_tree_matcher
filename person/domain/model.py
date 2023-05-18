@@ -28,6 +28,24 @@ class PersonOperationResponseDto(BaseModel):
     person: Optional[PersonOperationRequestDto] = None
 
 
+def person_to_dto(person: Person) -> PersonOperationRequestDto:
+    first_child = right_sibling = partner = None
+    if person.first_child:
+        first_child = person_to_dto(person.first_child)
+    if person.right_sibling:
+        right_sibling = person_to_dto(person.right_sibling)
+    if person.partner:
+        partner = person_to_dto(person.partner)
+
+    dto = PersonOperationRequestDto()
+    dto.name = person.name
+    dto.surname = person.surname
+    dto.first_child = first_child
+    dto.partner = partner
+    dto.right_sibling = right_sibling
+
+    return dto
+
 def person_from_dto(dto: PersonOperationRequestDto) -> Person:
     first_child = right_sibling = partner = None
     if dto.first_child:
