@@ -30,13 +30,13 @@ class TestMongoPersonRepository(unittest.TestCase):
         # A person who is already registered
         fixture = Person('alba',
                          'ramos pedroviejo')
-        obtained = self.sut.save(fixture)
+        obtained = self.sut.save_person(fixture)
         self.assertEqual(obtained, '1')
 
         fixture = Person('david',
                          'demarco',
                          right_sibling=Person('laura', 'romero rodriguez'))
-        obtained = self.sut.save(fixture)
+        obtained = self.sut.save_person(fixture)
         self.assertEqual(obtained, '7')
 
     @patch('mongomock.collection.Collection.insert_one')
@@ -46,7 +46,7 @@ class TestMongoPersonRepository(unittest.TestCase):
                                 'jimenez sanchez',
                                 right_sibling=Person('lucas', 'jimenez sanchez'))
 
-        self.sut.save(fixture_person)
+        self.sut.save_person(fixture_person)
         mocked_insert_one.assert_called_with({
             "name": 'alba',
             "surname": 'jimenez sanchez',
@@ -64,7 +64,7 @@ class TestMongoPersonRepository(unittest.TestCase):
                                 'ramos pedroviejo',
                                 right_sibling=Person('sonia', 'ramos pedroviejo'))
 
-        self.sut.save(fixture_person)
+        self.sut.save_person(fixture_person)
         mocked_insert_one.assert_called_with({
             "name": 'alba',
             "surname": 'ramos pedroviejo',
@@ -74,3 +74,25 @@ class TestMongoPersonRepository(unittest.TestCase):
         })
 
         # TODO insert a couple, how to handle the loop?
+
+    def test_get_person_not_registered(self):
+        fixture = Person('test',
+                         'test')
+        obtained = self.sut.get_person_id(fixture)
+        self.assertEqual(obtained, None)
+
+    def test_get_person_without_relatives(self):
+        fixture = Person(name="lucas",
+                         surname="jimenez sanchez")
+        obtained = self.sut.get_person_id(fixture)
+        self.assertEqual(obtained, "4")
+
+    def test_get_person_with_relatives(self):
+        fixture = Person(name="david",
+                         surname="demarco",
+                         right_sibling=Person(
+                             name="laura",
+                             surname="romero rodriguez"
+                         ))
+        obtained = self.sut.get_person_id(fixture)
+        self.assertEqual(obtained, "7")
