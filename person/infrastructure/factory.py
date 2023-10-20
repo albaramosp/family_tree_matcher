@@ -1,5 +1,5 @@
 from settings.pro import CLOUD_MONGO_CLIENT
-from person.domain.driven.ports import PersonRepository
+from person.application.driven.ports import PersonRepository
 from person.infrastructure.mongo_repository import MongoPersonRepository
 
 
