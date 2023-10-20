@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from person.domain.model import PersonDto
+from person.public.entities import PersonDto
 
 
 class MatcherManager(ABC):

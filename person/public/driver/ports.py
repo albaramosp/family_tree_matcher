@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from person.domain.model import PersonDto, PersonOperationResponseDto
+from person.public.entities import PersonOperationResponseDto, PersonDto
 
 
 class PersonManager(ABC):

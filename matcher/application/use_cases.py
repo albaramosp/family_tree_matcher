@@ -1,5 +1,6 @@
-from matcher.domain.driven.ports import MatcherManager
-from person.domain.driven.ports import PersonRepository, MalformedRequestException
+from matcher.application.driven.ports import MatcherManager
+from person.application.driven.ports import PersonRepository
+from person.public.exception import MalformedRequestException
 from person.domain.model import Person
 
 

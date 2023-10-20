@@ -16,7 +16,3 @@ class PersonRepository(ABC):
     @abstractmethod
     def save_person(self, person: Person) -> str:
         ...
-
-
-class MalformedRequestException(Exception):
-    ...

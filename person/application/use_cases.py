@@ -1,7 +1,7 @@
 from typing import Optional
 
 from person.domain.model import Person
-from person.domain.driven.ports import PersonRepository
+from person.application.driven.ports import PersonRepository
 
 
 class PersonUseCase:

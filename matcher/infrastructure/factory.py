@@ -1,4 +1,4 @@
-from matcher.domain.driven.ports import MatcherManager
+from matcher.application.driven.ports import MatcherManager
 from matcher.infrastructure.mongo_matcher import MongoMatcher
 from settings.pro import CLOUD_MONGO_CLIENT
 

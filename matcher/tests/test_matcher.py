@@ -1,14 +1,10 @@
 import unittest
-import json
-import os
 from unittest.mock import Mock
 
 from matcher.application.use_cases import MatchSiblingsUseCase
-from person.domain.driven.ports import MalformedRequestException, PersonRepository
+from person.application.driven.ports import PersonRepository
 from matcher.infrastructure.mongo_matcher import MongoMatcher
 from person.domain.model import Person
-from settings import test
-from mongomock import MongoClient
 
 
 class TestMatcher(unittest.TestCase):

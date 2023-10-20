@@ -1,6 +1,4 @@
 import unittest
-from unittest.mock import patch
-import pymongo
 from person.domain.model import Person
 from person.infrastructure.mongo_repository import MongoPersonRepository
 from settings import test

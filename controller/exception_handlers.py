@@ -1,7 +1,7 @@
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from person.domain.driven.ports import MalformedRequestException
+from person.public.exception import MalformedRequestException
 
 
 async def person_not_exists_exception_handler(request: Request, exc: MalformedRequestException):

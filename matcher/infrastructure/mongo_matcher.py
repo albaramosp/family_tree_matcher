@@ -1,6 +1,6 @@
 from typing import List, Optional
 from person.infrastructure.mongo_repository import MongoPersonRepository
-from matcher.domain.driven.ports import MatcherManager
+from matcher.application.driven.ports import MatcherManager
 
 
 class MongoMatcher(MatcherManager):
