@@ -1,8 +1,9 @@
-from abc import ABC, abstractmethod
+import abc
+from abc import ABC
 
 
 class MatcherManager(ABC):
-    @abstractmethod
+    @abc.abstractmethod
     def match_siblings(self, person_id: str):
         ...
 

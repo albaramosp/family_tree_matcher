@@ -1,13 +1,21 @@
+import abc
+
 from settings.pro import CLOUD_MONGO_CLIENT
 from person.application.driven.ports import PersonRepository
 from person.infrastructure.mongo_repository import MongoPersonRepository
 
 
-def create_mongo_person_repository() -> PersonRepository:
-    """
-    Creates a person repository from a given client. The repository's
-    implementation can change here, but the interface will be
-    respected, therefore application layer will not notice any
-    changes in implementation as long as the interface is kept.
-    """
-    return MongoPersonRepository(client=CLOUD_MONGO_CLIENT)
+class PersonRepositoryFactory(abc.ABC):
+    @abc.abstractmethod
+    def create_person_repository(self) -> PersonRepository:
+        ...
+
+
+class DefaultPersonRepositoryFactory(PersonRepositoryFactory):
+    def __init__(self):
+        self.repository = None
+
+    def create_person_repository(self) -> PersonRepository:
+        if not self.repository:
+            self.repository = MongoPersonRepository(client=CLOUD_MONGO_CLIENT)
+        return self.repository
