@@ -1,11 +1,10 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Optional
 
 from person.domain.model import Person
 
 
 class PersonRepository(ABC):
-    @abstractmethod
     def get_person_id(self,
                       person: Person,
                       first_child_id: str = None,
@@ -13,6 +12,5 @@ class PersonRepository(ABC):
                       partner_id: str = None) -> Optional[str]:
         ...
 
-    @abstractmethod
     def save_person(self, person: Person) -> str:
         ...

@@ -1,5 +1,6 @@
 from typing import List, Optional
-from person.infrastructure.mongo_repository import MongoPersonRepository
+
+from person.infrastructure.factory import DefaultPersonRepositoryFactory
 from matcher.application.driven.ports import MatcherManager
 
 
@@ -8,7 +9,7 @@ class MongoMatcher(MatcherManager):
         self.client = client
         self.database = self.client['family_tree_matcher']
         self.collection = self.database['people']
-        self.person_repository = MongoPersonRepository(client)
+        self.person_repository = DefaultPersonRepositoryFactory().create_person_repository()
 
     def match_siblings(self, person_id: str) -> List[dict]:
         instance = self.collection.find_one({

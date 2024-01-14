@@ -1,25 +1,16 @@
 from __future__ import annotations
 
 from person.application.use_cases import SavePersonUseCase
-from person.infrastructure.factory import create_mongo_person_repository
+from person.infrastructure.factory import DefaultPersonRepositoryFactory
 from person.public.driver.ports import PersonManager
 from person.domain.model import Person
 from person.public.entities import PersonDto, PersonOperationResponseDto
 
 
 class PersonAdapter(PersonManager):
-    def handle_save(self, rq: PersonDto) -> PersonOperationResponseDto:
-        person = person_from_dto(rq)
-        res = PersonOperationResponseDto()
-        try:
-            SavePersonUseCase(repository=create_mongo_person_repository()).save_person(person=person)
-            res.person = rq
-        except Exception as e:
-            print("Exception: ", e)
-            res.error = repr(e)
-            res.error_code = 500
-
-        return res
+    def handle_save(self, rq: PersonDto):
+        SavePersonUseCase(repository=DefaultPersonRepositoryFactory().create_person_repository()).save_person(
+            person=person_from_dto(rq))
 
 
 def person_to_dto(person: Person) -> PersonDto:
