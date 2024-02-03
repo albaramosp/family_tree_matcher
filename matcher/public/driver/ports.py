@@ -6,5 +6,9 @@ from person.public.entities import PersonDto
 
 class MatcherManager(ABC):
     @abstractmethod
-    def handle_match_siblings(self, rq: PersonDto) -> List[PersonDto]:
+    def match_siblings(self, rq: PersonDto) -> List[PersonDto]:
+        ...
+
+    @abstractmethod
+    def match_parents(self, rq: PersonDto) -> List[PersonDto]:
         ...

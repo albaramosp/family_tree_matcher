@@ -9,9 +9,7 @@ class MatcherUseCase:
         self.manager = manager
         self.person_repository = repository
 
-
-class MatchSiblingsUseCase(MatcherUseCase):
-    def execute(self, person: Person):
+    def match_siblings(self, person: Person):
         person_id = self.person_repository.get_person_id(Person(name=person.name,
                                                                 surname=person.surname))
         if not person_id:

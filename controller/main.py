@@ -20,7 +20,7 @@ def save_person(request: PersonDto):
 
 @app.post("/matcher/match_siblings/")
 def match_person_siblings(request: PersonDto) -> list[PersonDto]:
-    return create_matcher_adapter().handle_match_siblings(request)
+    return create_matcher_adapter().match_siblings(request)
 
 
 if __name__ == "__main__":
