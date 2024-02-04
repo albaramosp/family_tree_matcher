@@ -5,7 +5,7 @@ from controller.exception_handlers import person_not_exists_exception_handler
 from matcher.public.driver.factory import get_manager as create_matcher_adapter
 
 from person.public.exception import MalformedRequestException
-from person.public.entities import PersonDto
+from person.public.entities import PersonDto, AddParentRequestDto
 from person.public.driver.factory import get_manager as create_person_adapter
 
 app = FastAPI()
@@ -15,6 +15,12 @@ app.add_exception_handler(MalformedRequestException, person_not_exists_exception
 @app.post("/person/save/")
 def save_person(request: PersonDto):
     result = create_person_adapter().handle_save(request)
+    return result
+
+
+@app.post("/person/add_parent/")
+def add_parent(request: AddParentRequestDto):
+    result = create_person_adapter().add_parent(request)
     return result
 
 

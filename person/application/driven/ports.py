@@ -16,8 +16,11 @@ class PersonRepository(ABC):
                     person: Person,
                     first_child_id: str = None,
                     right_sibling_id: str = None,
-                    partner_id: str = None) -> Optional[Person]:
+                    partner_id: str = None) -> Optional[tuple[str, Person]]:
         ...
 
     def save_person(self, person: Person) -> str:
+        ...
+
+    def update_person(self, person_id: str, person: Person):
         ...

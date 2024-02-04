@@ -28,7 +28,7 @@ class SearchPersonUseCase(PersonUseCase):
 
 
 class SavePersonUseCase(PersonUseCase):
-    def save_person(self, person: Person):
+    def save_person(self, person: Person) -> str:
         first_child_id = right_sibling_id = partner_id = None
 
         if person.first_child:
@@ -48,3 +48,22 @@ class SavePersonUseCase(PersonUseCase):
                       partner_id)
 
         return person_id if person_id else self.repository.save_person(person)
+
+    def add_parent(self, child: Person, parent: Person) -> str:
+        db_parent = self.repository.find_person(parent)
+        if db_parent:
+            parent_id, stored_parent = db_parent
+
+            if not stored_parent.first_child:
+                parent.first_child = child
+            else:
+                child_id = self.repository.get_person_id(child)
+                child.right_sibling = stored_parent.first_child
+                if child_id:
+                    self.repository.update_person(child_id, child)
+                parent.first_child = child
+                return self.repository.update_person(parent_id, parent)
+        else:
+            parent.first_child = child
+
+        return self.repository.save_person(parent)
