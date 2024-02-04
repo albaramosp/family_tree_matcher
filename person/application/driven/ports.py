@@ -12,5 +12,12 @@ class PersonRepository(ABC):
                       partner_id: str = None) -> Optional[str]:
         ...
 
+    def find_person(self,
+                    person: Person,
+                    first_child_id: str = None,
+                    right_sibling_id: str = None,
+                    partner_id: str = None) -> Optional[Person]:
+        ...
+
     def save_person(self, person: Person) -> str:
         ...

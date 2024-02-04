@@ -67,7 +67,34 @@ class MongoPersonRepository(PersonRepository):
 
         return person['_id'] if person else None
 
+    def find_person(self,
+                    person: Person,
+                    first_child_id: str = None,
+                    right_sibling_id: str = None,
+                    partner_id: str = None) -> Optional[Person]:
+        query = {
+            "name": person.name,
+            "surname": person.surname
+        }
+
+        if first_child_id:
+            query.update({'first_child_id': first_child_id})
+        if right_sibling_id:
+            query.update({'right_sibling_id': right_sibling_id})
+        if partner_id:
+            query.update({'partner_id': partner_id})
+
+        doc = self.collection.find_one(query)
+
+        return self.person_from_mongo_instance(doc) if doc else None
+
     def save_person(self, person: Person) -> str:
         query = self.person_to_mongo(person)
 
-        return self.collection.insert_one(query).inserted_id
+        return self.collection.update_one(query, upsert=True).inserted_id
+
+    def add_child(self, child: Person, parent: Person):
+        if not parent.first_child:
+            parent.first_child = child
+
+        self.save_person(parent)

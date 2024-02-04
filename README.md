@@ -2,35 +2,17 @@
 Find your lost ancestors with Family Tree Matcher!
 This is a TDD and an attempt to learn more about architectures & design patterns.
 
-## Architecture & patterns
-### Hexagonal architecture (ports & adapters)
-Hexagonal architecture is also known as ports & adapters architecture. 
-It is related to Clean Architecture.
-According to this architecture, outer layers can access inner layers, but not the opposite. 
-Therefore, inner layers should only know abstractions regarding the outer layers, not their implementation.
-It establishes three layers:
-- **Infrastructure**: The outermost layer. 
-It stores everything related to external data sources. 
-It stores specific implementations of repositories (known as adapters).
-- **Application**: The use cases (everything that can be launched by an API call).
-- **Domain**: The innermost layer. The models & business rules of our context are here. 
-Repositories generic interfaces (or ports) are here. 
-We will divide the ports into driver and driven contexts. 
-Driver refers to the connection between presentation and application.
-Driven refers to the connection between infrastructure and application.
+## Parts in this project:
+[![](https://mermaid.ink/img/pako:eNp9Ul1r2zAU_StCD0MBJ_ijSWw_DAZZ026UpfuAtXYpN9J1bLAlI8nd0pD_PjWOS1q66km699xzzj1oR7kSSFNa1OoPL0Fb8nORS-KO6dYbDW1JION1hdKau77xaXXZX1CKXL4CrzOhqwfUpFX6eeILa1EbJUdkPP5ISpCixnsDD0g-kN-sAG6V3o567FfWgOUl6hfgQ-3eVOu6khvjxm5ejb3lhWcgoLVO-ujjG1ud-LhmJ06ONCt2dar-nb2p_46myKBt64qDrZQ8yn5mvwwSDgaHyXO2UA1U0iONi79-jxD7QOWLQJfLYZPhvXw2_n-qIruUhQZjdcdtp_FIdnHBzvssPWLcejVa5ZwZC3aIRawzdqXkRo3uTuipRxvUbg_hPtDuqZFTW2KDOU3dVWABXW1zmsu9g0Jn1Y-t5DR1-ujRrhVOYFGBM9cMxRYkTXf0L03HQZREE9-fT-NZ5EfxWRB6dEvTwI8m8TyIpsk8Sma-n8z2Hn1UylGEkzAMQtecBmfxPE5mB77bQ--Jfv8PnAjuUQ?type=png)](https://mermaid.live/edit#pako:eNp9Ul1r2zAU_StCD0MBJ_ijSWw_DAZZ026UpfuAtXYpN9J1bLAlI8nd0pD_PjWOS1q66km699xzzj1oR7kSSFNa1OoPL0Fb8nORS-KO6dYbDW1JION1hdKau77xaXXZX1CKXL4CrzOhqwfUpFX6eeILa1EbJUdkPP5ISpCixnsDD0g-kN-sAG6V3o567FfWgOUl6hfgQ-3eVOu6khvjxm5ejb3lhWcgoLVO-ujjG1ud-LhmJ06ONCt2dar-nb2p_46myKBt64qDrZQ8yn5mvwwSDgaHyXO2UA1U0iONi79-jxD7QOWLQJfLYZPhvXw2_n-qIruUhQZjdcdtp_FIdnHBzvssPWLcejVa5ZwZC3aIRawzdqXkRo3uTuipRxvUbg_hPtDuqZFTW2KDOU3dVWABXW1zmsu9g0Jn1Y-t5DR1-ujRrhVOYFGBM9cMxRYkTXf0L03HQZREE9-fT-NZ5EfxWRB6dEvTwI8m8TyIpsk8Sma-n8z2Hn1UylGEkzAMQtecBmfxPE5mB77bQ--Jfv8PnAjuUQ)
+## Patterns applied
 
-### Vertical slicing architecture
-When we have multiple models the hexagonal architecture structure may be difficult to escalate. 
-If we combine it with vertical slicing, we can create a directory for each model (like person and matcher) and apply the hexagonal architecture inside each.
-
-### Design patterns
-#### Repository
-This pattern will handle the creation and getting objects. 
-We will have the generic interface and the concrete implementations, so that the usage of the repository doesn't depend on concrete implementations.
-
-#### Factory
-This patterns states that we should avoid directly creating concrete objects and use a factory method instead for their creation.
-
+| Pattern                |                                                          Description                                                          |
+|------------------------|:-----------------------------------------------------------------------------------------------------------------------------:|
+| Adapter                |                                                              xxx                                                              |
+| Factory                |                      Abstract the creation of an object so that the caller doesn't need to know about it                      |
+| Hexagonal architecture |                           Isolates the core logic of the application form the external dependencies                           |
+| Singleton              |                    Instance an object only one time and return that instance any other times it is needed                     |
+| State                  | Avoid if/else dependency when choosing an strategy by subclassing that behaviour and calling <br/>the sub-methods dynamically |
 
 ## Launch tests
 To test with coverage, run the following commands:
