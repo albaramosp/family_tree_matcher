@@ -14,8 +14,6 @@ class PersonDto(BaseModel):
     right_sibling: Optional[PersonDto] = None
 
 
-@dataclass
-class PersonOperationResponseDto:
-    error_code: int = None
-    error: str = None
-    person: Optional[PersonDto] = None
+class AddParentRequestDto(BaseModel):
+    parent: PersonDto
+    child: PersonDto

@@ -4,13 +4,20 @@ from person.application.use_cases import SavePersonUseCase
 from person.infrastructure.factory import DefaultPersonRepositoryFactory
 from person.public.driver.ports import PersonManager
 from person.domain.model import Person
-from person.public.entities import PersonDto, PersonOperationResponseDto
+from person.public.entities import PersonDto, AddParentRequestDto
 
 
 class PersonAdapter(PersonManager):
+    def __init__(self):
+        self._repository = DefaultPersonRepositoryFactory().create_person_repository()
+        self._use_case = SavePersonUseCase(repository=self._repository)
+
     def handle_save(self, rq: PersonDto):
-        SavePersonUseCase(repository=DefaultPersonRepositoryFactory().create_person_repository()).save_person(
-            person=person_from_dto(rq))
+        self._use_case.save_person(person=person_from_dto(rq))
+
+    def add_parent(self, rq: AddParentRequestDto):
+        self._use_case.add_parent(parent=person_from_dto(rq.parent),
+                                  child=person_from_dto(rq.child))
 
 
 def person_to_dto(person: Person) -> PersonDto:

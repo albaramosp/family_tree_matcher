@@ -9,15 +9,23 @@ class MongoPersonRepository(PersonRepository):
         self.database = self.client['family_tree_matcher']
         self.collection = self.database['people']
 
-    @staticmethod
-    def person_to_mongo(person: Person) -> dict:
-        return {
+    def person_to_mongo(self, person: Person) -> dict:
+        query = {
             'name': person.name,
-            'surname': person.surname,
-            'first_child': person.first_child,
-            'right_sibling': person.right_sibling,
-            'partner': person.partner
+            'surname': person.surname
         }
+
+        if person.first_child:
+            query.update({
+                'first_child': self.get_person_id(person.first_child)})
+        if person.right_sibling:
+            query.update({
+                'right_sibling': self.get_person_id(person.right_sibling)})
+        if person.partner:
+            query.update({
+                'partner': self.get_person_id(person.partner)})
+
+        return query
 
     def person_from_mongo_instance(self, instance: dict) -> Person:
         first_child = right_sibling = partner = None
@@ -57,11 +65,11 @@ class MongoPersonRepository(PersonRepository):
         }
 
         if first_child_id:
-            query.update({'first_child_id': first_child_id})
+            query.update({'first_child': first_child_id})
         if right_sibling_id:
-            query.update({'right_sibling_id': right_sibling_id})
+            query.update({'right_sibling': right_sibling_id})
         if partner_id:
-            query.update({'partner_id': partner_id})
+            query.update({'partner': partner_id})
 
         person = self.collection.find_one(query)
 
@@ -78,23 +86,22 @@ class MongoPersonRepository(PersonRepository):
         }
 
         if first_child_id:
-            query.update({'first_child_id': first_child_id})
+            query.update({'first_child': first_child_id})
         if right_sibling_id:
-            query.update({'right_sibling_id': right_sibling_id})
+            query.update({'right_sibling': right_sibling_id})
         if partner_id:
-            query.update({'partner_id': partner_id})
+            query.update({'partner': partner_id})
 
         doc = self.collection.find_one(query)
 
-        return self.person_from_mongo_instance(doc) if doc else None
+        return (doc['_id'], self.person_from_mongo_instance(doc)) if doc else None
 
     def save_person(self, person: Person) -> str:
         query = self.person_to_mongo(person)
 
-        return self.collection.update_one(query, upsert=True).inserted_id
+        return self.collection.insert_one(query).inserted_id
 
-    def add_child(self, child: Person, parent: Person):
-        if not parent.first_child:
-            parent.first_child = child
-
-        self.save_person(parent)
+    def update_person(self, person_id: str, person: Person):
+        query = self.person_to_mongo(person)
+        self.collection.update_one({'_id': person_id},
+                                   {'$set': query})

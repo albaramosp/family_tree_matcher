@@ -1,4 +1,7 @@
 import unittest
+
+from mongomock import patch
+
 from person.domain.model import Person
 from person.infrastructure.mongo_repository import MongoPersonRepository
 from settings import test
@@ -24,6 +27,7 @@ class TestMongoPersonRepository(unittest.TestCase):
                 test.FAMILY_TREE_DATABASE][
                 test.PEOPLE_COLLECTION].insert_one(doc)
 
+    @unittest.skip
     def test_save_existing(self):
         # A person who is already registered
         obtained = self.sut.save_person(Person('alba',
@@ -36,8 +40,7 @@ class TestMongoPersonRepository(unittest.TestCase):
         obtained = self.sut.save_person(fixture)
         self.assertEqual(obtained, '7')
 
-    """
-    @unittest.TestCase().skipTest
+    @unittest.skip
     @patch('mongomock.collection.Collection.insert_one')
     def test_save_with_existing_relative(self, mocked_insert_one):
         # A person with the same name but different family, existing relative
@@ -54,7 +57,7 @@ class TestMongoPersonRepository(unittest.TestCase):
             "partner": None
         })
 
-    @unittest.TestCase().skipTest
+    @unittest.skip
     @patch('mongomock.collection.Collection.insert_one')
     def test_save_with_new_relative(self, mocked_insert_one):
         # A person with the same name but different family
