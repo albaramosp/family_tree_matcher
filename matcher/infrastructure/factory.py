@@ -1,8 +1,7 @@
 import abc
-
 from matcher.application.driven.ports import MatcherManager
 from matcher.infrastructure.mongo_matcher import MongoMatcher
-from settings.pro import CLOUD_MONGO_CLIENT
+from person.infrastructure.factory import DefaultPersonRepositoryFactory
 
 
 class MatcherManagerFactory(abc.ABC):
@@ -18,5 +17,6 @@ class DefaultMatcherManagerFactory(MatcherManagerFactory):
 
     def create_matcher_manager(self) -> MatcherManager:
         if not self.manager:
-            self.manager = MongoMatcher(client=CLOUD_MONGO_CLIENT)
+            self.manager = MongoMatcher(
+                person_repository=DefaultPersonRepositoryFactory().create_person_repository())
         return self.manager

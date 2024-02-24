@@ -1,6 +1,5 @@
 import abc
 
-from settings.pro import CLOUD_MONGO_CLIENT
 from person.application.driven.ports import PersonRepository
 from person.infrastructure.mongo_repository import MongoPersonRepository
 
@@ -17,5 +16,5 @@ class DefaultPersonRepositoryFactory(PersonRepositoryFactory):
 
     def create_person_repository(self) -> PersonRepository:
         if not self.repository:
-            self.repository = MongoPersonRepository(client=CLOUD_MONGO_CLIENT)
+            self.repository = MongoPersonRepository()
         return self.repository
