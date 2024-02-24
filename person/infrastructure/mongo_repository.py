@@ -1,10 +1,24 @@
 from typing import Optional
 from person.domain.model import Person
 from person.application.driven.ports import PersonRepository
+from settings.environment import get_environment
 
 
 class MongoPersonRepository(PersonRepository):
-    def __init__(self, client):
+    def __init__(self):
+        self._set_database()
+
+    def _set_database(self):
+        env = get_environment()
+        if env == "pro":
+            from settings.pro import CLOUD_MONGO_CLIENT
+            client = CLOUD_MONGO_CLIENT
+        elif env == "test":
+            from settings.test import CLOUD_MONGO_CLIENT
+            client = CLOUD_MONGO_CLIENT
+        else:
+            raise Exception("Environment not set")
+
         self.client = client
         self.database = self.client['family_tree_matcher']
         self.collection = self.database['people']

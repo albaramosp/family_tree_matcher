@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import Optional
-from dataclasses import dataclass
 
 from pydantic import BaseModel
 
@@ -9,9 +8,14 @@ from pydantic import BaseModel
 class PersonDto(BaseModel):
     name: str
     surname: str
-    first_child: Optional[PersonDto] = None
-    partner: Optional[PersonDto] = None
-    right_sibling: Optional[PersonDto] = None
+
+
+class PersonWithRelativesDto(BaseModel):
+    name: str
+    surname: str
+    first_child: Optional[PersonWithRelativesDto] = None
+    partner: Optional[PersonWithRelativesDto] = None
+    right_sibling: Optional[PersonWithRelativesDto] = None
 
 
 class AddParentRequestDto(BaseModel):

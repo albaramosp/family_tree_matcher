@@ -2,8 +2,8 @@ import abc
 from typing import List
 
 from person.application.driven.ports import PersonRepository
-from person.infrastructure.factory import DefaultPersonRepositoryFactory
 from matcher.application.driven.ports import MatcherManager
+from settings.environment import get_environment
 
 
 class SiblingMatcher(abc.ABC):
@@ -61,11 +61,24 @@ class RightSiblingMatcher(SiblingMatcher):
 
 
 class MongoMatcher(MatcherManager):
-    def __init__(self, client):
+    def __init__(self, person_repository):
+        self.person_repository = person_repository
+        self._set_database()
+
+    def _set_database(self):
+        env = get_environment()
+        if env == "pro":
+            from settings.pro import CLOUD_MONGO_CLIENT
+            client = CLOUD_MONGO_CLIENT
+        elif env == "test":
+            from settings.test import CLOUD_MONGO_CLIENT
+            client = CLOUD_MONGO_CLIENT
+        else:
+            raise Exception("Environment not set")
+
         self.client = client
         self.database = self.client['family_tree_matcher']
         self.collection = self.database['people']
-        self.person_repository = DefaultPersonRepositoryFactory().create_person_repository()
 
     def match_siblings(self, person_id: str) -> List[dict]:
         instance = self.collection.find_one({

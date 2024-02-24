@@ -6,13 +6,13 @@ from matcher.infrastructure.mongo_matcher import MongoMatcher
 from person.infrastructure.mongo_repository import MongoPersonRepository
 from person.public.exception import MalformedRequestException
 from person.domain.model import Person
-
-from settings.test import CLOUD_MONGO_CLIENT
+from settings.environment import set_environment
 
 
 class MatchSiblingsUseCaseTestCase(TestCase):
     def setUp(self) -> None:
-        self._repository = MongoPersonRepository(CLOUD_MONGO_CLIENT)
+        set_environment("test")
+        self._repository = MongoPersonRepository()
         self.manager = MagicMock(MongoMatcher)
         self.sut = MatcherUseCase(manager=self.manager,
                                   repository=self._repository)
