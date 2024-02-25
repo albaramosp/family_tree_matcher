@@ -1,7 +1,7 @@
 from typing import Optional
 from person.domain.model import Person
 from person.application.driven.ports import PersonRepository
-from settings.environment import get_environment
+from settings.environment import get_environment, EnvironmentException
 
 
 class MongoPersonRepository(PersonRepository):
@@ -17,7 +17,7 @@ class MongoPersonRepository(PersonRepository):
             from settings.test import CLOUD_MONGO_CLIENT
             client = CLOUD_MONGO_CLIENT
         else:
-            raise Exception("Environment not set")
+            raise EnvironmentException("Environment not set")
 
         self.client = client
         self.database = self.client['family_tree_matcher']
@@ -119,3 +119,41 @@ class MongoPersonRepository(PersonRepository):
         query = self.person_to_mongo(person)
         self.collection.update_one({'_id': person_id},
                                    {'$set': query})
+
+    def search_left_siblings(self,
+                             person_id: str,
+                             siblings: list):
+        if person_id is None:
+            return
+        else:
+            people = self.collection.find({
+                'right_sibling': person_id
+            })
+
+            if people:
+                for person in people:
+                    parsed_person = self.person_from_mongo_instance(person)
+                    siblings.append(parsed_person)
+                    self.search_left_siblings(
+                        person_id=person.get('_id'),
+                        siblings=siblings)
+
+    def search_right_siblings(self,
+                              person_id: str,
+                              siblings: list):
+        if person_id is None:
+            return
+        else:
+            person = self.collection.find_one({
+                '_id': person_id
+            })
+
+            if person and person.get('right_sibling'):
+                parsed_sibling = self.person_from_mongo_instance(
+                    self.collection.find_one({
+                        '_id': person['right_sibling']
+                    }))
+                siblings.append(parsed_sibling)
+                self.search_right_siblings(
+                    person_id=person['right_sibling'],
+                    siblings=siblings)

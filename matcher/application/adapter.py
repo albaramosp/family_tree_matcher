@@ -1,7 +1,6 @@
 from typing import List
 
 from matcher.application.use_cases import MatcherUseCase
-from matcher.infrastructure.factory import DefaultMatcherManagerFactory
 from matcher.public.driver.ports import MatcherManager
 from person.application.adapter import person_from_dto, person_to_dto
 from person.infrastructure.factory import DefaultPersonRepositoryFactory
@@ -12,8 +11,8 @@ class MatcherAdapter(MatcherManager):
     def match_siblings(self, rq: PersonDto) -> List[PersonDto]:
         person = person_from_dto(rq)
         matches = MatcherUseCase(
-            manager=DefaultMatcherManagerFactory().create_matcher_manager(),
-            repository=DefaultPersonRepositoryFactory().create_person_repository()).match_siblings(person=person)
+            repository=DefaultPersonRepositoryFactory().create_person_repository()
+        ).match_siblings(person=person)
 
         return [person_to_dto(person) for person in matches] \
             if matches else []

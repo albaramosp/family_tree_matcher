@@ -9,3 +9,7 @@ def set_environment(environment: str):
 
 def get_environment() -> str | None:
     return ENVIRONMENT
+
+
+class EnvironmentException(Exception):
+    pass
