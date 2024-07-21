@@ -32,11 +32,11 @@ class LoggingHandler(metaclass=LoggingHandlerMeta):
     def get_logger(self) -> Logger:
         if not self.logger:
             formatter = logging.Formatter("%(message)s")
-            info_handler = logging.handlers.WatchedFileHandler("./family_tree_matcher_info.json")
+            info_handler = logging.handlers.WatchedFileHandler("./logs/family_tree_matcher_info.json")
             info_handler.setFormatter(formatter)
             info_handler.setLevel("INFO")
 
-            error_handler = logging.handlers.WatchedFileHandler("./family_tree_matcher_error.json")
+            error_handler = logging.handlers.WatchedFileHandler("./logs/family_tree_matcher_error.json")
             error_handler.setFormatter(formatter)
             error_handler.setLevel("ERROR")
 
