@@ -1,3 +1,5 @@
+import logging.handlers
+
 from pymongo import MongoClient
 from dotenv import load_dotenv
 from os import getcwd, environ
