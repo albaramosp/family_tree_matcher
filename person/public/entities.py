@@ -21,3 +21,8 @@ class PersonWithRelativesDto(BaseModel):
 class AddParentRequestDto(BaseModel):
     parent: PersonDto
     child: PersonDto
+
+
+class AddPartnerRequestDto(BaseModel):
+    partner: PersonDto
+    person: PersonDto

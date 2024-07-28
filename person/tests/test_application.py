@@ -76,7 +76,8 @@ class SavePersonTestCase(TestCase):
         expected = deepcopy(fixture_parent)
         expected.first_child = fixture_child
         self._sut.add_parent(fixture_child, fixture_parent)
-        self._repository.save_person.assert_called_with(expected)
+        self._repository.update_person.assert_called_with('test',
+                                                          expected)
 
     def test_add_parent_with_child(self):
         fixture_child = Person(name='test', surname='test')
@@ -99,3 +100,26 @@ class SavePersonTestCase(TestCase):
 
         self._repository.update_person.assert_has_calls([call('test', expected_child),
                                                          call('test', expected_parent)])
+
+    def test_add_non_stored_partner(self):
+        fixture_person = Person(name='test', surname='test')
+        fixture_partner = Person(name='test2', surname='test2')
+        self._repository.find_person = Mock(return_value=None)
+        self._sut.save_person = Mock()
+
+        expected = deepcopy(fixture_person)
+        expected.partner = fixture_partner
+        self._sut.add_partner(fixture_person, fixture_partner)
+        self._repository.save_person.assert_called_with(expected)
+
+    def test_add_partner(self):
+        fixture_person = Person(name='test', surname='test')
+        fixture_partner = Person(name='test2', surname='test2')
+        self._repository.find_person = Mock(return_value=('test', fixture_person))
+        self._sut.save_person = Mock()
+
+        expected = deepcopy(fixture_person)
+        expected.partner = fixture_partner
+        self._sut.add_partner(fixture_person, fixture_partner)
+        self._repository.update_person.assert_called_with('test',
+                                                          expected)
