@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from person.public.entities import AddParentRequestDto, PersonWithRelativesDto
+from person.public.entities import AddParentRequestDto, PersonWithRelativesDto, AddPartnerRequestDto
 
 
 class PersonManager(ABC):
@@ -9,4 +9,8 @@ class PersonManager(ABC):
 
     @abstractmethod
     def add_parent(self, rq: AddParentRequestDto):
+        ...
+
+    @abstractmethod
+    def add_partner(self, rq: AddPartnerRequestDto):
         ...

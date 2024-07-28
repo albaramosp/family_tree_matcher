@@ -3,7 +3,7 @@ from __future__ import annotations
 from person.application.use_cases import SavePersonUseCase
 from person.public.driver.ports import PersonManager
 from person.domain.model import Person
-from person.public.entities import PersonDto, AddParentRequestDto, PersonWithRelativesDto
+from person.public.entities import PersonDto, AddParentRequestDto, PersonWithRelativesDto, AddPartnerRequestDto
 
 from person.infrastructure.factory import DefaultPersonRepositoryFactory
 
@@ -18,6 +18,10 @@ class PersonAdapter(PersonManager):
     def add_parent(self, rq: AddParentRequestDto):
         self._use_case.add_parent(parent=person_from_dto(rq.parent),
                                   child=person_from_dto(rq.child))
+
+    def add_partner(self, rq: AddPartnerRequestDto):
+        self._use_case.add_partner(person=person_from_dto(rq.person),
+                                   partner=person_from_dto(rq.partner))
 
 
 def person_to_dto(person: Person) -> PersonDto:

@@ -28,18 +28,21 @@ class SearchPersonUseCase(PersonUseCase):
 
 
 class SavePersonUseCase(PersonUseCase):
+    def _get_or_create(self, person: Person) -> str:
+        _id = self.repository.get_person_id(person)
+        if not _id:
+            _id = self.save_person(person)
+        return _id
+
     def save_person(self, person: Person) -> str:
         first_child_id = right_sibling_id = partner_id = None
 
         if person.first_child:
             first_child_id = self.save_person(person.first_child)
-            person.first_child = first_child_id
         if person.right_sibling:
             right_sibling_id = self.save_person(person.right_sibling)
-            person.right_sibling = right_sibling_id
         if person.partner:
             partner_id = self.save_person(person.partner)
-            person.partner = partner_id
 
         person_id = self.repository.get_person_id(
                       person,
@@ -48,6 +51,17 @@ class SavePersonUseCase(PersonUseCase):
                       partner_id)
 
         return person_id if person_id else self.repository.save_person(person)
+
+    def add_partner(self, person: Person, partner: Person) -> str:
+        db_person = self.repository.find_person(person)
+        if db_person:
+            person_id, stored_person = db_person
+            stored_person.partner = partner
+            self._get_or_create(partner)
+            return self.repository.update_person(person_id, stored_person)
+        else:
+            person.partner = partner
+            return self.repository.save_person(person)
 
     def add_parent(self, child: Person, parent: Person) -> str:
         db_parent = self.repository.find_person(parent)
@@ -62,7 +76,8 @@ class SavePersonUseCase(PersonUseCase):
                 if child_id:
                     self.repository.update_person(child_id, child)
                 parent.first_child = child
-                return self.repository.update_person(parent_id, parent)
+
+            return self.repository.update_person(parent_id, parent)
         else:
             parent.first_child = child
 

@@ -11,7 +11,7 @@ from controller.logging_handler import LoggingHandler
 from matcher.public.driver.factory import get_manager as create_matcher_adapter
 
 from person.public.exception import MalformedRequestException
-from person.public.entities import PersonDto, AddParentRequestDto, PersonWithRelativesDto
+from person.public.entities import PersonDto, AddParentRequestDto, PersonWithRelativesDto, AddPartnerRequestDto
 from person.public.driver.factory import get_manager as create_person_adapter
 from settings.environment import set_environment
 
@@ -67,6 +67,12 @@ def save_person(request: PersonWithRelativesDto):
 @app.post("/person/add_parent/")
 def add_parent(request: AddParentRequestDto):
     result = create_person_adapter().add_parent(request)
+    return result
+
+
+@app.post("/person/add_partner/")
+def add_partner(request: AddPartnerRequestDto):
+    result = create_person_adapter().add_partner(request)
     return result
 
 
