@@ -35,6 +35,14 @@ class SavePersonUseCase(PersonUseCase):
         return _id
 
     def save_person(self, person: Person) -> str:
+        """
+        Register a person into the system
+
+        :param person: person to register, with optional relatives
+        :type person: Person
+        :return: The id of the person registered
+        :rtype: str
+        """
         first_child_id = right_sibling_id = partner_id = None
 
         if person.first_child:
